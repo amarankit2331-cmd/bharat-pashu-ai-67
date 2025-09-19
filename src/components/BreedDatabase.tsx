@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Search, MapPin, Info, Leaf, Activity, ChevronDown } from "lucide-react";
+import { Search, MapPin, Info, Leaf, Activity, ChevronDown, Shield, Pill } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Breed {
@@ -23,6 +23,15 @@ interface Breed {
     energy: string;
     calcium: string;
     phosphorus: string;
+  };
+  health: {
+    commonDiseases: string[];
+    precautions: string[];
+    medicines: {
+      disease: string;
+      treatment: string;
+      dosage: string;
+    }[];
   };
 }
 
@@ -44,6 +53,15 @@ const breedDatabase: Breed[] = [
       energy: "65-70% TDN",
       calcium: "0.6-0.8%",
       phosphorus: "0.4-0.5%"
+    },
+    health: {
+      commonDiseases: ["Foot and Mouth Disease", "Mastitis", "Heat Stress", "Tick Fever"],
+      precautions: ["Regular vaccination", "Clean water supply", "Shade provision", "Tick control"],
+      medicines: [
+        { disease: "Foot and Mouth Disease", treatment: "FMD Vaccine", dosage: "2ml subcutaneous annually" },
+        { disease: "Mastitis", treatment: "Penicillin + Streptomycin", dosage: "As per vet advice" },
+        { disease: "Tick Fever", treatment: "Oxytetracycline", dosage: "20mg/kg body weight" }
+      ]
     }
   },
   {
@@ -63,6 +81,15 @@ const breedDatabase: Breed[] = [
       energy: "65-68% TDN",
       calcium: "0.6-0.7%",
       phosphorus: "0.4-0.5%"
+    },
+    health: {
+      commonDiseases: ["Mastitis", "Pneumonia", "Diarrhea", "Bloat"],
+      precautions: ["Proper ventilation", "Clean milking", "Fresh water", "Regular deworming"],
+      medicines: [
+        { disease: "Mastitis", treatment: "Amoxicillin", dosage: "15mg/kg twice daily" },
+        { disease: "Pneumonia", treatment: "Oxytetracycline", dosage: "10mg/kg daily" },
+        { disease: "Diarrhea", treatment: "ORS + Antibiotic", dosage: "As per vet prescription" }
+      ]
     }
   },
   {
@@ -82,6 +109,15 @@ const breedDatabase: Breed[] = [
       energy: "60-65% TDN",
       calcium: "0.5-0.7%",
       phosphorus: "0.4-0.5%"
+    },
+    health: {
+      commonDiseases: ["Heat Stress", "Parasitic Infections", "Vitamin Deficiency", "Lameness"],
+      precautions: ["Shade management", "Regular deworming", "Mineral supplements", "Hoof trimming"],
+      medicines: [
+        { disease: "Heat Stress", treatment: "Electrolytes + Vitamin C", dosage: "50ml twice daily" },
+        { disease: "Parasitic Infections", treatment: "Ivermectin", dosage: "0.2mg/kg body weight" },
+        { disease: "Vitamin Deficiency", treatment: "B-Complex injection", dosage: "10ml weekly" }
+      ]
     }
   },
   {
@@ -101,6 +137,15 @@ const breedDatabase: Breed[] = [
       energy: "70-75% TDN",
       calcium: "0.7-0.9%",
       phosphorus: "0.5-0.6%"
+    },
+    health: {
+      commonDiseases: ["Hemorrhagic Septicemia", "Black Quarter", "Mastitis", "Reproductive Disorders"],
+      precautions: ["HS vaccination", "BQ vaccination", "Clean environment", "Balanced nutrition"],
+      medicines: [
+        { disease: "Hemorrhagic Septicemia", treatment: "HS Vaccine", dosage: "5ml subcutaneous annually" },
+        { disease: "Black Quarter", treatment: "BQ Vaccine", dosage: "5ml subcutaneous annually" },
+        { disease: "Mastitis", treatment: "Ceftiofur", dosage: "1mg/kg body weight" }
+      ]
     }
   },
   {
@@ -120,6 +165,15 @@ const breedDatabase: Breed[] = [
       energy: "70-75% TDN",
       calcium: "0.8-1.0%",
       phosphorus: "0.5-0.6%"
+    },
+    health: {
+      commonDiseases: ["Milk Fever", "Ketosis", "Retained Placenta", "Foot Rot"],
+      precautions: ["Calcium supplements", "Energy balance", "Hygiene maintenance", "Hoof care"],
+      medicines: [
+        { disease: "Milk Fever", treatment: "Calcium Gluconate IV", dosage: "500ml slow IV" },
+        { disease: "Ketosis", treatment: "Dextrose + Vitamin B12", dosage: "500ml IV daily" },
+        { disease: "Foot Rot", treatment: "Copper Sulfate", dosage: "10% solution footbath" }
+      ]
     }
   },
   {
@@ -139,6 +193,15 @@ const breedDatabase: Breed[] = [
       energy: "65-70% TDN",
       calcium: "0.6-0.8%",
       phosphorus: "0.4-0.5%"
+    },
+    health: {
+      commonDiseases: ["Joint Problems", "Heat Stress", "Digestive Disorders", "Skin Diseases"],
+      precautions: ["Regular exercise", "Adequate shade", "Proper feeding", "Skin hygiene"],
+      medicines: [
+        { disease: "Joint Problems", treatment: "Phenylbutazone", dosage: "4mg/kg body weight" },
+        { disease: "Heat Stress", treatment: "Electrolyte solution", dosage: "100ml twice daily" },
+        { disease: "Digestive Disorders", treatment: "Probiotics", dosage: "50g daily with feed" }
+      ]
     }
   },
 ];
@@ -151,6 +214,7 @@ export const BreedDatabase = ({ className }: BreedDatabaseProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<"all" | "cattle" | "buffalo">("all");
   const [expandedNutrition, setExpandedNutrition] = useState<string[]>([]);
+  const [expandedHealth, setExpandedHealth] = useState<string[]>([]);
 
   const filteredBreeds = breedDatabase.filter((breed) => {
     const matchesSearch = 
@@ -165,6 +229,14 @@ export const BreedDatabase = ({ className }: BreedDatabaseProps) => {
 
   const toggleNutritionExpanded = (breedId: string) => {
     setExpandedNutrition(prev => 
+      prev.includes(breedId) 
+        ? prev.filter(id => id !== breedId)
+        : [...prev, breedId]
+    );
+  };
+
+  const toggleHealthExpanded = (breedId: string) => {
+    setExpandedHealth(prev => 
       prev.includes(breedId) 
         ? prev.filter(id => id !== breedId)
         : [...prev, breedId]
@@ -300,6 +372,80 @@ export const BreedDatabase = ({ className }: BreedDatabaseProps) => {
                       <span className="text-muted-foreground">Phosphorus:</span>
                       <p className="font-medium">{breed.nutrition.phosphorus}</p>
                     </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Health Information */}
+              <Collapsible
+                open={expandedHealth.includes(breed.id)}
+                onOpenChange={() => toggleHealthExpanded(breed.id)}
+              >
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-md hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium">Health & Disease Management</span>
+                  </div>
+                  <ChevronDown className={cn(
+                    "w-4 h-4 transition-transform",
+                    expandedHealth.includes(breed.id) && "rotate-180"
+                  )} />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2 space-y-3">
+                  {/* Common Diseases */}
+                  <div className="bg-red-50 p-3 rounded-md border border-red-100">
+                    <h5 className="text-sm font-medium text-red-800 mb-2 flex items-center gap-1">
+                      <Activity className="w-3 h-3" />
+                      Common Diseases
+                    </h5>
+                    <div className="flex flex-wrap gap-1">
+                      {breed.health.commonDiseases.map((disease, index) => (
+                        <Badge key={index} variant="outline" className="text-xs border-red-200 text-red-700">
+                          {disease}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Precautions */}
+                  <div className="bg-yellow-50 p-3 rounded-md border border-yellow-100">
+                    <h5 className="text-sm font-medium text-yellow-800 mb-2 flex items-center gap-1">
+                      <Shield className="w-3 h-3" />
+                      Prevention & Precautions
+                    </h5>
+                    <div className="space-y-1">
+                      {breed.health.precautions.map((precaution, index) => (
+                        <div key={index} className="text-xs text-yellow-700 flex items-center gap-1">
+                          <span className="w-1 h-1 bg-yellow-600 rounded-full"></span>
+                          {precaution}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Medicines */}
+                  <div className="bg-green-50 p-3 rounded-md border border-green-100">
+                    <h5 className="text-sm font-medium text-green-800 mb-2 flex items-center gap-1">
+                      <Pill className="w-3 h-3" />
+                      Treatment & Medicines
+                    </h5>
+                    <div className="space-y-2">
+                      {breed.health.medicines.map((medicine, index) => (
+                        <div key={index} className="text-xs bg-white p-2 rounded border border-green-200">
+                          <div className="font-medium text-green-800">{medicine.disease}</div>
+                          <div className="text-green-700 mt-1">
+                            <span className="font-medium">Medicine:</span> {medicine.treatment}
+                          </div>
+                          <div className="text-green-600">
+                            <span className="font-medium">Dosage:</span> {medicine.dosage}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+                    ⚠️ Always consult a qualified veterinarian before administering any medicine
                   </div>
                 </CollapsibleContent>
               </Collapsible>
