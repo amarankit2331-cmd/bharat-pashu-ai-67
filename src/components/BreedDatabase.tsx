@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Info } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Search, MapPin, Info, Leaf, Activity, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Breed {
@@ -15,6 +16,14 @@ interface Breed {
   avgWeight: string;
   milkYield: string;
   color: string;
+  nutrition: {
+    dailyFeed: string;
+    drymatter: string;
+    protein: string;
+    energy: string;
+    calcium: string;
+    phosphorus: string;
+  };
 }
 
 const breedDatabase: Breed[] = [
@@ -28,6 +37,14 @@ const breedDatabase: Breed[] = [
     avgWeight: "350-400 kg",
     milkYield: "10-15 L/day",
     color: "Light to dark red with white patches",
+    nutrition: {
+      dailyFeed: "12-15 kg",
+      drymatter: "2.5-3% of body weight",
+      protein: "12-14%",
+      energy: "65-70% TDN",
+      calcium: "0.6-0.8%",
+      phosphorus: "0.4-0.5%"
+    }
   },
   {
     id: "2",
@@ -39,6 +56,14 @@ const breedDatabase: Breed[] = [
     avgWeight: "300-400 kg",
     milkYield: "8-12 L/day",
     color: "Light to medium brown",
+    nutrition: {
+      dailyFeed: "10-14 kg",
+      drymatter: "2.5-3% of body weight",
+      protein: "11-13%",
+      energy: "65-68% TDN",
+      calcium: "0.6-0.7%",
+      phosphorus: "0.4-0.5%"
+    }
   },
   {
     id: "3",
@@ -50,6 +75,14 @@ const breedDatabase: Breed[] = [
     avgWeight: "300-350 kg",
     milkYield: "6-10 L/day",
     color: "Dark red to light red",
+    nutrition: {
+      dailyFeed: "8-12 kg",
+      drymatter: "2.5-3% of body weight",
+      protein: "10-12%",
+      energy: "60-65% TDN",
+      calcium: "0.5-0.7%",
+      phosphorus: "0.4-0.5%"
+    }
   },
   {
     id: "4",
@@ -61,6 +94,14 @@ const breedDatabase: Breed[] = [
     avgWeight: "500-600 kg",
     milkYield: "12-18 L/day",
     color: "Jet black",
+    nutrition: {
+      dailyFeed: "15-20 kg",
+      drymatter: "3-3.5% of body weight",
+      protein: "14-16%",
+      energy: "70-75% TDN",
+      calcium: "0.7-0.9%",
+      phosphorus: "0.5-0.6%"
+    }
   },
   {
     id: "5",
@@ -72,6 +113,14 @@ const breedDatabase: Breed[] = [
     avgWeight: "450-550 kg",
     milkYield: "15-20 L/day",
     color: "Black with white markings",
+    nutrition: {
+      dailyFeed: "16-22 kg",
+      drymatter: "3-3.5% of body weight",
+      protein: "15-17%",
+      energy: "70-75% TDN",
+      calcium: "0.8-1.0%",
+      phosphorus: "0.5-0.6%"
+    }
   },
   {
     id: "6",
@@ -83,6 +132,14 @@ const breedDatabase: Breed[] = [
     avgWeight: "600-800 kg",
     milkYield: "8-12 L/day",
     color: "Black",
+    nutrition: {
+      dailyFeed: "18-25 kg",
+      drymatter: "2.8-3.2% of body weight",
+      protein: "12-14%",
+      energy: "65-70% TDN",
+      calcium: "0.6-0.8%",
+      phosphorus: "0.4-0.5%"
+    }
   },
 ];
 
@@ -93,6 +150,7 @@ interface BreedDatabaseProps {
 export const BreedDatabase = ({ className }: BreedDatabaseProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<"all" | "cattle" | "buffalo">("all");
+  const [expandedNutrition, setExpandedNutrition] = useState<string[]>([]);
 
   const filteredBreeds = breedDatabase.filter((breed) => {
     const matchesSearch = 
@@ -104,6 +162,14 @@ export const BreedDatabase = ({ className }: BreedDatabaseProps) => {
     
     return matchesSearch && matchesType;
   });
+
+  const toggleNutritionExpanded = (breedId: string) => {
+    setExpandedNutrition(prev => 
+      prev.includes(breedId) 
+        ? prev.filter(id => id !== breedId)
+        : [...prev, breedId]
+    );
+  };
 
   return (
     <div className={cn("w-full max-w-4xl mx-auto space-y-6", className)}>
@@ -192,6 +258,51 @@ export const BreedDatabase = ({ className }: BreedDatabaseProps) => {
                 <span className="text-muted-foreground">Color:</span>
                 <p className="font-medium">{breed.color}</p>
               </div>
+
+              {/* Nutrition Information */}
+              <Collapsible
+                open={expandedNutrition.includes(breed.id)}
+                onOpenChange={() => toggleNutritionExpanded(breed.id)}
+              >
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-md hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Leaf className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium">Nutrition Requirements</span>
+                  </div>
+                  <ChevronDown className={cn(
+                    "w-4 h-4 transition-transform",
+                    expandedNutrition.includes(breed.id) && "rotate-180"
+                  )} />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2 space-y-2">
+                  <div className="grid grid-cols-2 gap-2 text-xs bg-muted/30 p-3 rounded-md">
+                    <div>
+                      <span className="text-muted-foreground">Daily Feed:</span>
+                      <p className="font-medium">{breed.nutrition.dailyFeed}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Dry Matter:</span>
+                      <p className="font-medium">{breed.nutrition.drymatter}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Protein:</span>
+                      <p className="font-medium">{breed.nutrition.protein}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Energy (TDN):</span>
+                      <p className="font-medium">{breed.nutrition.energy}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Calcium:</span>
+                      <p className="font-medium">{breed.nutrition.calcium}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Phosphorus:</span>
+                      <p className="font-medium">{breed.nutrition.phosphorus}</p>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             </CardContent>
           </Card>
         ))}
