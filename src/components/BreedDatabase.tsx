@@ -23,6 +23,8 @@ interface Breed {
     energy: string;
     calcium: string;
     phosphorus: string;
+    foodTypes: string[];
+    preferredFeed: string[];
   };
   health: {
     commonDiseases: string[];
@@ -52,7 +54,9 @@ const breedDatabase: Breed[] = [
       protein: "12-14%",
       energy: "65-70% TDN",
       calcium: "0.6-0.8%",
-      phosphorus: "0.4-0.5%"
+      phosphorus: "0.4-0.5%",
+      foodTypes: ["Green fodder", "Dry fodder", "Concentrate feed", "Mineral mixture"],
+      preferredFeed: ["Berseem", "Jowar", "Maize", "Wheat straw", "Groundnut cake", "Cotton seed cake"]
     },
     health: {
       commonDiseases: ["Foot and Mouth Disease", "Mastitis", "Heat Stress", "Tick Fever"],
@@ -80,7 +84,9 @@ const breedDatabase: Breed[] = [
       protein: "11-13%",
       energy: "65-68% TDN",
       calcium: "0.6-0.7%",
-      phosphorus: "0.4-0.5%"
+      phosphorus: "0.4-0.5%",
+      foodTypes: ["Green fodder", "Dry fodder", "Concentrate feed", "Silage"],
+      preferredFeed: ["Lucerne", "Shaftal", "Maize fodder", "Paddy straw", "Mustard cake", "Rice bran"]
     },
     health: {
       commonDiseases: ["Mastitis", "Pneumonia", "Diarrhea", "Bloat"],
@@ -108,7 +114,9 @@ const breedDatabase: Breed[] = [
       protein: "10-12%",
       energy: "60-65% TDN",
       calcium: "0.5-0.7%",
-      phosphorus: "0.4-0.5%"
+      phosphorus: "0.4-0.5%",
+      foodTypes: ["Grazing", "Dry fodder", "Concentrate feed", "Tree leaves"],
+      preferredFeed: ["Natural grass", "Sorghum", "Pearl millet", "Guar", "Castor cake", "Sesame cake"]
     },
     health: {
       commonDiseases: ["Heat Stress", "Parasitic Infections", "Vitamin Deficiency", "Lameness"],
@@ -136,7 +144,9 @@ const breedDatabase: Breed[] = [
       protein: "14-16%",
       energy: "70-75% TDN",
       calcium: "0.7-0.9%",
-      phosphorus: "0.5-0.6%"
+      phosphorus: "0.5-0.6%",
+      foodTypes: ["Green fodder", "Dry fodder", "Concentrate feed", "Aquatic plants"],
+      preferredFeed: ["Water hyacinth", "Berseem", "Jowar", "Wheat bran", "Soybean meal", "Maize"]
     },
     health: {
       commonDiseases: ["Hemorrhagic Septicemia", "Black Quarter", "Mastitis", "Reproductive Disorders"],
@@ -164,7 +174,9 @@ const breedDatabase: Breed[] = [
       protein: "15-17%",
       energy: "70-75% TDN",
       calcium: "0.8-1.0%",
-      phosphorus: "0.5-0.6%"
+      phosphorus: "0.5-0.6%",
+      foodTypes: ["Green fodder", "Dry fodder", "Concentrate feed", "Silage"],
+      preferredFeed: ["Napier grass", "Maize silage", "Alfalfa", "Cottonseed cake", "Wheat bran", "Mineral mix"]
     },
     health: {
       commonDiseases: ["Milk Fever", "Ketosis", "Retained Placenta", "Foot Rot"],
@@ -192,7 +204,9 @@ const breedDatabase: Breed[] = [
       protein: "12-14%",
       energy: "65-70% TDN",
       calcium: "0.6-0.8%",
-      phosphorus: "0.4-0.5%"
+      phosphorus: "0.4-0.5%",
+      foodTypes: ["Green fodder", "Dry fodder", "Browse", "Concentrate feed"],
+      preferredFeed: ["Babul leaves", "Jowar", "Bajra", "Groundnut straw", "Coconut cake", "Salt mixture"]
     },
     health: {
       commonDiseases: ["Joint Problems", "Heat Stress", "Digestive Disorders", "Skin Diseases"],
@@ -346,7 +360,7 @@ export const BreedDatabase = ({ className }: BreedDatabaseProps) => {
                     expandedNutrition.includes(breed.id) && "rotate-180"
                   )} />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2 space-y-2">
+                <CollapsibleContent className="mt-2 space-y-3">
                   <div className="grid grid-cols-2 gap-2 text-xs bg-muted/30 p-3 rounded-md">
                     <div>
                       <span className="text-muted-foreground">Daily Feed:</span>
@@ -371,6 +385,30 @@ export const BreedDatabase = ({ className }: BreedDatabaseProps) => {
                     <div>
                       <span className="text-muted-foreground">Phosphorus:</span>
                       <p className="font-medium">{breed.nutrition.phosphorus}</p>
+                    </div>
+                  </div>
+
+                  {/* Food Types */}
+                  <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
+                    <h5 className="text-sm font-medium text-blue-800 mb-2">Feed Categories:</h5>
+                    <div className="flex flex-wrap gap-1">
+                      {breed.nutrition.foodTypes.map((type, index) => (
+                        <Badge key={index} variant="outline" className="text-xs border-blue-200 text-blue-700">
+                          {type}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Preferred Feed */}
+                  <div className="bg-green-50 p-3 rounded-md border border-green-100">
+                    <h5 className="text-sm font-medium text-green-800 mb-2">Recommended Feed:</h5>
+                    <div className="flex flex-wrap gap-1">
+                      {breed.nutrition.preferredFeed.map((feed, index) => (
+                        <Badge key={index} variant="outline" className="text-xs border-green-200 text-green-700">
+                          {feed}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                 </CollapsibleContent>
